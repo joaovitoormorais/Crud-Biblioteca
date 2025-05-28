@@ -1,5 +1,7 @@
 package com.sistema.biblioteca.dtos;
 
+import com.sistema.biblioteca.models.Categoria;
+
 public class CategoriaDTO {
 
     private String nome;
@@ -12,6 +14,11 @@ public class CategoriaDTO {
     public CategoriaDTO(String nome, String descrição) {
         this.nome = nome;
         this.descrição = descrição;
+    }
+
+    public CategoriaDTO(Categoria categoria) {
+        this.nome = categoria.getNome();
+        this.descrição = categoria.getDescrição();
     }
 
     public String getNome() {
