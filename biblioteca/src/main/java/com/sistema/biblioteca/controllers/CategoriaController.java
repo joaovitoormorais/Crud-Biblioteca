@@ -3,6 +3,7 @@ package com.sistema.biblioteca.controllers;
 import com.sistema.biblioteca.dtos.CategoriaDTO;
 import com.sistema.biblioteca.models.Categoria;
 import com.sistema.biblioteca.services.CategoriaService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("livro")
+@RequestMapping("categoria")
 public class CategoriaController {
 
     @Autowired
@@ -39,5 +40,31 @@ public class CategoriaController {
         return ResponseEntity.ok().body(new CategoriaDTO(cat));
     }
 
-}
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoriaDTO> update(@PathVariable String nome, @Valid @RequestBody CategoriaDTO categoriaDTO) {
+      Categoria categoriaExistente = categoriaService.findByNome(nome);
+
+      if(categoriaExistente == null) {
+          return ResponseEntity.notFound().build();
+      }
+
+      categoriaExistente.setNome(categoriaDTO.getNome());
+      categoriaExistente.setDescrição(categoriaDTO.getDescrição());
+
+      Categoria categoriaAtualizada = categoriaService.update(categoriaExistente);
+
+      CategoriaDTO categoriaAtualizadaDTO = new CategoriaDTO();
+      categoriaAtualizada.setNome(categoriaAtualizada.getNome());
+      categoriaAtualizada.setDescrição(categoriaAtualizada.getDescrição());
+
+      return ResponseEntity.ok().body(categoriaAtualizadaDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        categoriaService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+    }
+
 

@@ -24,4 +24,14 @@ public class CategoriaService {
     public Categoria save(Integer idCat, CategoriaDTO categoriaDTO) {
         return null;
     }
+
+    public Categoria update(Categoria cat) {
+    }
+
+    public void delete(Integer id) {
+
+    }
+
+    public Categoria findByNome(String nome) {
+    }
 }
