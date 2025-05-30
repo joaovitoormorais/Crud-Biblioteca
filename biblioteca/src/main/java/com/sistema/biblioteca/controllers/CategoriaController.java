@@ -4,11 +4,13 @@ import com.sistema.biblioteca.dtos.CategoriaDTO;
 import com.sistema.biblioteca.models.Categoria;
 import com.sistema.biblioteca.services.CategoriaService;
 import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("categoria")
@@ -17,47 +19,34 @@ public class CategoriaController {
     @Autowired
     CategoriaService categoriaService;
 
+    @Autowired
+    ModelMapper modelMapper;
+
     @GetMapping("/{id}")
     public ResponseEntity<CategoriaDTO> findById(@PathVariable Integer id) {
         Categoria categoria = categoriaService.findById(id);
-        return ResponseEntity.ok().body(new CategoriaDTO(categoria));
+        return ResponseEntity.ok().body(modelMapper.map(categoria, CategoriaDTO.class));
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoriaDTO>> findAll(@RequestParam(value = "categoria", defaultValue = "0") Integer categoriaId) {
+    public ResponseEntity<List<CategoriaDTO>> findAll() {
         List<Categoria> list = categoriaService.findAll();
-
-        List<CategoriaDTO> categoriaDTOList = list.stream().map(CategoriaDTO::
-                new).toList();
-        return ResponseEntity.ok().body(categoriaDTOList);
-
+        return ResponseEntity.ok().body(list.stream().map(categoria -> modelMapper.map(categoria, CategoriaDTO.class)).collect(Collectors.toList()));
     }
 
     @PostMapping
-    public ResponseEntity<CategoriaDTO> save(@RequestParam(value = "categoria", defaultValue = "0") Integer id_cat,
-                                             @RequestBody CategoriaDTO categoriaDTO) {
-        Categoria cat = categoriaService.save(id_cat, categoriaDTO);
-        return ResponseEntity.ok().body(new CategoriaDTO(cat));
+    public ResponseEntity<CategoriaDTO> save(@Valid @RequestBody CategoriaDTO categoriaDTO) {
+        categoriaDTO.setId(null);
+        Categoria cat = categoriaService.save(modelMapper.map(categoriaDTO, Categoria.class));
+        return ResponseEntity.ok().body(modelMapper.map(cat, CategoriaDTO.class));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoriaDTO> update(@PathVariable String nome, @Valid @RequestBody CategoriaDTO categoriaDTO) {
-      Categoria categoriaExistente = categoriaService.findByNome(nome);
+    public ResponseEntity<CategoriaDTO> update(@PathVariable Integer id, @Valid @RequestBody CategoriaDTO categoriaDTO) {
+        categoriaDTO.setId(id);
+        Categoria categoria = categoriaService.update(modelMapper.map(categoriaDTO, Categoria.class));
+        return ResponseEntity.ok().body(modelMapper.map(categoria, CategoriaDTO.class));
 
-      if(categoriaExistente == null) {
-          return ResponseEntity.notFound().build();
-      }
-
-      categoriaExistente.setNome(categoriaDTO.getNome());
-      categoriaExistente.setDescrição(categoriaDTO.getDescrição());
-
-      Categoria categoriaAtualizada = categoriaService.update(categoriaExistente);
-
-      CategoriaDTO categoriaAtualizadaDTO = new CategoriaDTO();
-      categoriaAtualizada.setNome(categoriaAtualizada.getNome());
-      categoriaAtualizada.setDescrição(categoriaAtualizada.getDescrição());
-
-      return ResponseEntity.ok().body(categoriaAtualizadaDTO);
     }
 
     @DeleteMapping("/{id}")
