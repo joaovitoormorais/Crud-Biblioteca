@@ -2,6 +2,7 @@ package com.sistema.biblioteca.dtos;
 
 import com.sistema.biblioteca.enums.Tamanho;
 import com.sistema.biblioteca.models.Categoria;
+import com.sistema.biblioteca.models.Livro;
 
 public class LivroDTO {
 
@@ -23,6 +24,10 @@ public class LivroDTO {
         this.texto = texto;
         this.categoria = categoria;
         this.tamanho = tamanho;
+    }
+
+    public LivroDTO(Livro livro) {
+
     }
 
     public Integer getId() {
